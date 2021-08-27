@@ -1,6 +1,20 @@
+html{
+  text-align: center;
+  alignment: center;
+  justify-content: center;
+  transition-property: vertical-align;
+}
+
+#inputDiv{
+  justify-content: center;
+  alignment: center;
+}
+
+
 .App {
   text-align: center;
 }
+
 
 .App-logo {
   height: 40vmin;
