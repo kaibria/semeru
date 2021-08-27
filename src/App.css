@@ -10,6 +10,10 @@ html{
   alignment: center;
 }
 
+h1{
+  font-size: 100px !important;
+}
+
 
 .App {
   text-align: center;
