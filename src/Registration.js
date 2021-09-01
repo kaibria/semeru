@@ -8,16 +8,20 @@ export default function Registration() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [firstPw, setFirstPw] = useState('')
+    let [validationStatus, setValidationStatus] = useState(0)
 
     function storeUser() {
         firebase.database().ref('usernames/' + username + '/security/password').set(password)
     }
 
     function validate() {
-        console.log(username)
-        if (username != null && firstPw == password) {
+        if (username.length > 2 && firstPw === password) {
             storeUser()
             console.log(username)
+            setValidationStatus(1)
+
+        } else {
+            setValidationStatus(0)
         }
     }
 
@@ -32,9 +36,9 @@ export default function Registration() {
                     Form of Address
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                    <Dropdown.Item href="#/action-1">Mr.</Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">Ms.</Dropdown.Item>
-                    <Dropdown.Item href="#/action-3">Mrs.</Dropdown.Item>
+                    <Dropdown.Item >Mr.</Dropdown.Item>
+                    <Dropdown.Item >Ms.</Dropdown.Item>
+                    <Dropdown.Item >Mrs.</Dropdown.Item>
                 </Dropdown.Menu>
             </Dropdown>
 
@@ -78,10 +82,10 @@ export default function Registration() {
                     </FormControl>
                 </InputGroup>
             </div>
-
+            {validationStatus}
             <br/>
-            <Button onClick={() => validate()}>Register</Button>
-            <h6>Already have an account? <a href="login">Sign in</a></h6>
+            <Button onClick={() => validate()}><a className={"buttonLink"} href={validationStatus == 1 ? "/semeru/#/login" : <div></div>}>Register</a></Button>
+            <h6>Already have an account? <a  className={"normalLink"} href="/semeru/#/login">Sign in</a></h6>
 
         </div>
     );

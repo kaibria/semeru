@@ -14,6 +14,30 @@ h1{
   font-size: 100px !important;
 }
 
+a.buttonLink:visited {
+  text-decoration: none;
+  color: white;
+  font-weight: normal;
+}
+
+a.buttonLink:link{
+  text-decoration: none;
+  color: white;
+  font-weight: normal;
+}
+
+a.normalLink:visited {
+  text-decoration: none;
+  color: blue;
+  font-weight: normal;
+}
+
+a.normalLink:link{
+  text-decoration: none;
+  color: blue;
+  font-weight: normal;
+}
+
 
 .App {
   text-align: center;
