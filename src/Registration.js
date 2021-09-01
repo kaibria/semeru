@@ -2,6 +2,7 @@ import {FormControl, InputGroup, Button, DropdownButton, Dropdown} from "react-b
 import React, {useState} from "react";
 import './App.css';
 import firebase from "firebase";
+import {NavLink, useHistory} from "react-router-dom";
 
 
 export default function Registration() {
@@ -9,6 +10,8 @@ export default function Registration() {
     const [password, setPassword] = useState('')
     const [firstPw, setFirstPw] = useState('')
     let [validationStatus, setValidationStatus] = useState(0)
+
+    const history = useHistory();
 
     function storeUser() {
         firebase.database().ref('usernames/' + username + '/security/password').set(password)
@@ -19,6 +22,7 @@ export default function Registration() {
             storeUser()
             console.log(username)
             setValidationStatus(1)
+            history.push("/login")
 
         } else {
             setValidationStatus(0)
@@ -85,7 +89,7 @@ export default function Registration() {
             {validationStatus}
             <br/>
             <Button onClick={() => validate()}><a className={"buttonLink"} href={validationStatus == 1 ? "/semeru/#/login" : <div></div>}>Register</a></Button>
-            <h6>Already have an account? <a  className={"normalLink"} href="/semeru/#/login">Sign in</a></h6>
+            <h6>Already have an account? <NavLink  className={"normalLink"} to="/login">Sign in</NavLink></h6>
 
         </div>
     );

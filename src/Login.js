@@ -2,6 +2,7 @@ import {FormControl, InputGroup, Button} from "react-bootstrap";
 import React, {useState} from "react";
 import './App.css';
 import firebase from "firebase";
+import {NavLink, useHistory} from "react-router-dom";
 import {element} from "prop-types";
 
 
@@ -12,7 +13,9 @@ export default function Login() {
     const [password, setPassword] = useState('')
     const [pwFromDatabase, setPwFromDatabase] = useState('')
     let [validationStatus, setValidationStatus] = useState(0)
+    const [errorMessage, setErrorMessage] = useState("")
 
+    const history = useHistory();
 
     function onLogin() {
         findPassword()
@@ -20,8 +23,9 @@ export default function Login() {
         if (password === pwFromDatabase){
             console.log("login successful")
             setValidationStatus(1)
-
+            history.push("/semeru")
         }else{
+            setErrorMessage("Incorrect password")
             setValidationStatus(0)
         }
     }
@@ -68,9 +72,9 @@ export default function Login() {
                 </InputGroup>
             </div>
             <br/>
-            <Button onClick={() => onLogin()}><a className={"buttonLink"} href={validationStatus == 1 ? "/semeru/#/semeru" : console.log("first")}>Login</a></Button>
+            <Button onClick={() => onLogin()}>Login</Button>
             <br/>
-            <h6>Don't have an account yet? <a className={"normalLink"} href="/semeru/#/registration">Register</a></h6>
+            <h6>Don't have an account yet? <NavLink className={"normalLink"} to="/registration">Register</NavLink></h6>
         </div>
     );
 }
