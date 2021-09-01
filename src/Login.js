@@ -1,34 +1,37 @@
 import {FormControl, InputGroup, Button} from "react-bootstrap";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import './App.css';
 import firebase from "firebase";
 import {NavLink, useHistory} from "react-router-dom";
-import {element} from "prop-types";
-
-
+import Main from "./Main";
 
 
 export default function Login() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [pwFromDatabase, setPwFromDatabase] = useState('')
-    let [validationStatus, setValidationStatus] = useState(0)
     const [errorMessage, setErrorMessage] = useState("")
 
     const history = useHistory();
 
     function onLogin() {
         findPassword()
-
-        if (password === pwFromDatabase){
-            console.log("login successful")
-            setValidationStatus(1)
-            history.push("/semeru")
-        }else{
-            setErrorMessage("Incorrect password")
-            setValidationStatus(0)
-        }
     }
+
+    useEffect(() => {
+        if(password !== '' || pwFromDatabase !== '') {
+            if (password === pwFromDatabase) {
+                console.log("login successful")
+                localStorage.setItem('username', username);
+                history.push("/semeru")
+                setErrorMessage("")
+
+            } else {
+                setErrorMessage("Incorrect password")
+
+            }
+        }
+    }, [pwFromDatabase])
 
     function findPassword() {
         // on() method
@@ -39,7 +42,7 @@ export default function Login() {
 
 
             } else {
-                console.log("User existiert nicht")
+                setErrorMessage("Incorrect Username")
 
             }
         });
@@ -71,6 +74,7 @@ export default function Login() {
                     </FormControl>
                 </InputGroup>
             </div>
+            <h6 id={"errormessage"}>{errorMessage}</h6>
             <br/>
             <Button onClick={() => onLogin()}>Login</Button>
             <br/>

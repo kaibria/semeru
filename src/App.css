@@ -3,6 +3,7 @@ html{
   alignment: center;
   justify-content: center;
   transition-property: vertical-align;
+
 }
 
 #inputDiv{
@@ -12,6 +13,11 @@ html{
 
 h1{
   font-size: 100px !important;
+  background-color: #D2E2CF !important;
+}
+
+#errormessage{
+  color: red !important;
 }
 
 a.buttonLink:visited {

@@ -9,7 +9,8 @@ export default function Registration() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [firstPw, setFirstPw] = useState('')
-    let [validationStatus, setValidationStatus] = useState(0)
+    const [errorMessage, setErrorMessage] = useState("")
+
 
     const history = useHistory();
 
@@ -18,14 +19,16 @@ export default function Registration() {
     }
 
     function validate() {
-        if (username.length > 2 && firstPw === password) {
-            storeUser()
-            console.log(username)
-            setValidationStatus(1)
-            history.push("/login")
-
+        if (firstPw === password) {
+            if(username.length > 1){
+                storeUser()
+                console.log(username)
+                history.push("/login")
+            }else {
+                setErrorMessage("Username too short")
+            }
         } else {
-            setValidationStatus(0)
+            setErrorMessage("Passwords do not match")
         }
     }
 
@@ -86,9 +89,9 @@ export default function Registration() {
                     </FormControl>
                 </InputGroup>
             </div>
-            {validationStatus}
+            <h6 id={"errormessage"}>{errorMessage}</h6>
             <br/>
-            <Button onClick={() => validate()}><a className={"buttonLink"} href={validationStatus == 1 ? "/semeru/#/login" : <div></div>}>Register</a></Button>
+            <Button onClick={() => validate()}>Sign Up</Button>
             <h6>Already have an account? <NavLink  className={"normalLink"} to="/login">Sign in</NavLink></h6>
 
         </div>
