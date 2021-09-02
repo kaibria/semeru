@@ -39,7 +39,7 @@ export default function Registration() {
             <br/>
 
             <Dropdown>
-                <Dropdown.Toggle variant="primary" id="dropdown-basic">
+                <Dropdown.Toggle variant="primary" id="dropdown-basic" style={{background:"#526b4d", border:"#526b4d"}}>
                     Form of Address
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
@@ -91,7 +91,7 @@ export default function Registration() {
             </div>
             <h6 id={"errormessage"}>{errorMessage}</h6>
             <br/>
-            <Button onClick={() => validate()}>Sign Up</Button>
+            <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={() => validate()}>Sign Up</Button>
             <h6>Already have an account? <NavLink  className={"normalLink"} to="/login">Sign in</NavLink></h6>
 
         </div>

@@ -76,7 +76,7 @@ export default function Login() {
             </div>
             <h6 id={"errormessage"}>{errorMessage}</h6>
             <br/>
-            <Button onClick={() => onLogin()}>Login</Button>
+            <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={() => onLogin()}>Login</Button>
             <br/>
             <h6>Don't have an account yet? <NavLink className={"normalLink"} to="/registration">Register</NavLink></h6>
         </div>

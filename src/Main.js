@@ -1,6 +1,7 @@
 import './App.css';
 import firebase from 'firebase';
 import React, {useEffect, useState} from "react";
+import ReactStopwatch from 'react-stopwatch';
 import {Button, FormControl, InputGroup, Spinner} from "react-bootstrap";
 import {DoorClosedFill, DoorOpen, DoorOpenFill, Square} from "react-bootstrap-icons";
 import {NavLink} from "react-router-dom";
@@ -12,6 +13,14 @@ export default function ToDoListe() {
     const [message, setMessage] = useState('')
     const [stopIndex, setStopIndex] = useState(0)
     const [showSpinner, setShowSpinner] = useState(false)
+    const [stopButtonValue, setStopButtonValue] = useState(true);
+    const [pauseButtonValue, setPauseButtonValue] = useState(true);
+    const [interruptButtonValue, setInterruptButtonValue] = useState(true);
+    const [stopWatchValue, setStopWatchValue] = useState(false);
+    const [seconds, setSeconds] = useState(0)
+    const [minutes, setMinutes] = useState(0)
+    const [hours, setHours] = useState(0)
+
 
 
     useEffect(() => {
@@ -26,14 +35,42 @@ export default function ToDoListe() {
     }
 
     function startTime(index) {
+        setStopWatchValue(true)
+        setStopButtonValue(false)
+        setPauseButtonValue(false)
+        setInterruptButtonValue(false)
         setStopIndex(index)
         entrys[index].start = getCurrentTime()
         storeEntry(user)
     }
 
     function stopTime() {
+        resetValues()
         entrys[stopIndex].stop = getCurrentTime()
         storeEntry(user)
+    }
+
+    function resetValues(){
+        setSeconds(0)
+        setMinutes(0)
+        setHours(0)
+        setStopWatchValue(false)
+        setStopButtonValue(true)
+        setPauseButtonValue(true)
+        setInterruptButtonValue(true)
+    }
+
+    function interruptTime(){
+
+    }
+
+    function pauseTime(){
+        if(stopWatchValue === false){
+            setStopWatchValue(true)
+        }else{
+            setStopWatchValue(false)
+        }
+
     }
 
 
@@ -109,15 +146,44 @@ export default function ToDoListe() {
         )
     }
 
+    function Stopwatch(){
+        return(
+            <ReactStopwatch
+                seconds={seconds}
+                minutes={minutes}
+                hours={hours}
+                onChange={({hours, minutes, seconds}) =>{
+                    setSeconds(seconds)
+                    setMinutes(minutes)
+                    setHours(hours)
+                }
+                }
+                onCallback={() => console.log('Finish')}
+                autoStart={stopWatchValue}
+                render={({ formatted}) => {
+                    return (
+                        <div>
+                            <p>
+                                { formatted }
+                            </p>
+                        </div>
+                    );
+                }}
+            />
+        )
+    }
+
     function Settings() {
         return (
             <div className="settingsComponent">
                 <br/>
-                <h2>Settings</h2>
+                <h4 className={"setting"}>S E T T I N G S</h4>
                 <br/>
-                <Button style={{background:"#526b4d", border:"#526b4d"}}>Pause</Button>
-                <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={stopTime}>Stop</Button>
-                <Button style={{background:"#526b4d", border:"#526b4d"}}>Interrupt</Button>
+                <h3  className={"stopwatch"}><Stopwatch></Stopwatch></h3>
+                <br/>
+                <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={pauseTime} disabled={pauseButtonValue}>Pause/Resume</Button>&emsp;
+                <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={stopTime} disabled={stopButtonValue}>Stop</Button>&emsp;
+                <Button style={{background:"#526b4d", border:"#526b4d"}} disabled={interruptButtonValue}>Interrupt</Button>
                 <br/>
                 <br/>
             </div>
@@ -130,10 +196,10 @@ export default function ToDoListe() {
                 <thead>
                 <tr>
                     <th scope="col">Name</th>
-                    <th scope="col">Startzeit</th>
-                    <th scope="col">Endzeit</th>
-                    <th scope="col">Starten / Neustarten</th>
-                    <th scope="col">Löschen</th>
+                    <th scope="col">Start Time</th>
+                    <th scope="col">End Time</th>
+                    <th scope="col">Start / Restart</th>
+                    <th scope="col">Delete</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -143,7 +209,7 @@ export default function ToDoListe() {
                         <td>{entry.start}</td>
                         <td>{entry.stop}</td>
                         <td>
-                            <Button onClick={() => startTime(index)}>Starten</Button>
+                            <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={() => startTime(index)}>Start</Button>
                         </td>
                         <td>
                             <div onClick={() => deleteEntry(index)}>
@@ -169,9 +235,9 @@ export default function ToDoListe() {
             <br/>
 
 
-            <h2>Entry's</h2>
-
-            <h5>Neues To Do:</h5>
+            <h2>Tasks</h2>
+            <br/>
+            <h5>Task Name</h5>
             <div className={"d-flex"} id={"inputDiv"}>
                 <InputGroup className="form-group w-25">
                     <FormControl
@@ -182,16 +248,16 @@ export default function ToDoListe() {
                     />
                 </InputGroup>
             </div>
-
             <br/>
+            <Button  style={{background:"#526b4d", border:"#526b4d"}} onClick={saveEntry}>Add</Button>
             <br/>
-            <Button  style={{background:"#526b4d", border:"#526b4d"}} onClick={saveEntry}>Speichern</Button>
             <br/>
             <BetterTable/>
             <br/>
-            <Button  style={{background:"#526b4d", border:"#526b4d"}} onClick={deleteAll}>Alle löschen</Button>
+            <Button  style={{background:"#526b4d", border:"#526b4d"}} onClick={deleteAll}>Delete All</Button>
             <br/>
             <br/>
+
             <Settings></Settings>
         </div>
     );
