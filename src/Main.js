@@ -13,53 +13,42 @@ export default function ToDoListe() {
     const [errorMessage, setErrorMessage] = useState('')
     const [showSpinner, setShowSpinner] = useState(false)
 
-    function BetterTable() {
-        return (
-            <table className="table">
-                <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Hinzugefügt am</th>
-                    <th scope="col">Fällig am</th>
-                    <th scope="col">Fertig?</th>
-                </tr>
-                </thead>
-                <tbody>
-                {entrys.length === 0 ? <div></div> : entrys.map((toDo, index) =>
-                    <tr key={index}>
-                        <td>{toDo.name}</td>
-                        <td>{toDo.start}</td>
-                        <td>{toDo.ende}</td>
-                        <td>
-                            <div onClick={() => deleteToDo(index)}>
-                                <Like/>
-                            </div>
-                        </td>
-                    </tr>
-                )}
-                </tbody>
-            </table>
-        )
-    }
-
     useEffect(() => {
         loadContent()
     }, [])
 
-    function buttonPressed() {
+    function saveEntry() {
 
-        newEntry.start = getCurrentDate()
+        // newEntry.start = getCurrentTime()
         entrys.push(newEntry)
-        storeToDo(user)
+        storeEntry(user)
     }
 
-    function getCurrentDate() {
-        return new Date().toISOString().substring(0, 10)
+    function startTime(index) {
+        entrys[index].start = getCurrentTime()
+        storeEntry(user)
     }
 
-    function storeToDo(user) {
+    function getCurrentTime() {
+        let today = new Date()
+        return today.getMinutes < 10 ? today.getHours() + ':0' + today.getMinutes() : today.getHours() + ':' + today.getMinutes()
+    }
+
+    function getWelcomeMessage() {
+        let hours = new Date().getHours()
+
+        if (hours >= 0 && hours < 12) {
+            return "Good Morning, "
+        } else if (hours >= 12 && hours < 18) {
+            return "Good Afternoon, "
+        } else if (hours >= 18 && hours < 0) {
+            return "Good Evening, "
+        }
+    }
+
+    function storeEntry(user) {
         if (user != null) {
-            firebase.database().ref('usernames/' + user + '/toDo').set(entrys);
+            firebase.database().ref('usernames/' + user + '/entries').set(entrys);
         }
     }
 
@@ -68,12 +57,12 @@ export default function ToDoListe() {
         let newArray = []
         setEntrys(newArray)
         setShowSpinner(true)
-        readToDos()
+        readEntrys()
     }
 
-    function readToDos() {
+    function readEntrys() {
         // on() method
-        firebase.database().ref('usernames/' + user + '/toDo').on('value', (snap) => {
+        firebase.database().ref('usernames/' + user + '/entries').on('value', (snap) => {
             if (snap.val()) {
                 console.log("snap.val()", snap.val())
                 setEntrys(snap.val())
@@ -82,12 +71,12 @@ export default function ToDoListe() {
         });
     }
 
-    function deleteToDo(index) {
-        let newArray = entrys.filter((todo, idx) => idx !== index);
+    function deleteEntry(index) {
+        let newArray = entrys.filter((entry, idx) => idx !== index);
         setEntrys(newArray);
 
         if (user != null) {
-            firebase.database().ref('usernames/' + user + '/toDo').set(newArray);
+            firebase.database().ref('usernames/' + user + '/entries').set(newArray);
         }
 
 
@@ -98,14 +87,74 @@ export default function ToDoListe() {
         setEntrys(newArray)
 
         if (user != null) {
-            firebase.database().ref('usernames/' + user + '/toDo').set(newArray);
+            firebase.database().ref('usernames/' + user + '/entries').set(newArray);
         }
+    }
+
+    function Logout() {
+        return (
+            <div>
+                <h4 className="logout">S E M E R U<NavLink className={"logoutButton"}
+                    to="/login"><DoorClosedFill style={{color:"#526b4d", border:"#526b4d"}}></DoorClosedFill></NavLink></h4>
+            </div>
+        )
+    }
+
+    function Settings() {
+        return (
+            <div className="settingsComponent">
+                <br/>
+                <h2>Settings</h2>
+                <br/>
+                <Button style={{background:"#526b4d", border:"#526b4d"}}>Pause</Button>
+                <Button style={{background:"#526b4d", border:"#526b4d"}}>Stop</Button>
+                <Button style={{background:"#526b4d", border:"#526b4d"}}>Interrupt</Button>
+                <br/>
+                <br/>
+            </div>
+        )
+    }
+
+    function BetterTable() {
+        return (
+            <table className="table">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Startzeit</th>
+                    <th scope="col">Endzeit</th>
+                    <th scope="col">Starten / Neustarten</th>
+                    <th scope="col">Löschen</th>
+                </tr>
+                </thead>
+                <tbody>
+                {entrys.length === 0 ? <div></div> : entrys.map((entry, index) =>
+                    <tr key={index}>
+                        <td>{entry.name}</td>
+                        <td>{entry.start}</td>
+                        <td>{entry.ende}</td>
+                        <td>
+                            <Button onClick={() => startTime(index)}>Starten</Button>
+                        </td>
+                        <td>
+                            <div onClick={() => deleteEntry(index)}>
+                                <Like/>
+                            </div>
+                        </td>
+                    </tr>
+                )}
+                </tbody>
+            </table>
+        )
     }
 
     return (
 
         <div>
-            <h1>&emsp;&emsp;&emsp;&ensp;&ensp;&ensp;Welcome {user} &emsp;&emsp;&emsp;&ensp;<NavLink className={"logout"} to="/login"><DoorClosedFill></DoorClosedFill></NavLink></h1>
+            <Logout/>
+            <h1>{getWelcomeMessage()} {user}
+            <br/>
+            </h1>
             <br/>
             <br/>
             <br/>
@@ -125,18 +174,16 @@ export default function ToDoListe() {
                 </InputGroup>
             </div>
 
-            <br/><br/>
-            <h5>Fällig am:</h5>
-            <input id={"toDoDate"} type={"date"} value={newEntry.ende}
-                   onChange={e => setNewEntry(old => ({...old, ende: e.target.value}))}/>
-
             <br/>
             <br/>
-            <Button onClick={buttonPressed}>Speichern</Button>
+            <Button  style={{background:"#526b4d", border:"#526b4d"}} onClick={saveEntry}>Speichern</Button>
             <br/>
             <BetterTable/>
             <br/>
-            <Button onClick={deleteAll}>Alle löschen</Button>
+            <Button  style={{background:"#526b4d", border:"#526b4d"}} onClick={deleteAll}>Alle löschen</Button>
+            <br/>
+            <br/>
+            <Settings></Settings>
         </div>
     );
 }

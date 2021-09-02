@@ -16,6 +16,21 @@ h1{
   background-color: #D2E2CF !important;
 }
 
+.settingsComponent{
+  background-color: #D2E2CF;
+}
+.logout{
+  background-color:  #D2E2CF;
+  font-size: 40px !important;
+  margin: 0px 0px 0px 0px;
+}
+
+.logoutButton{
+  position: absolute;
+  right: 16px;
+
+}
+
 #errormessage{
   color: red !important;
 }
