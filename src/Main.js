@@ -8,10 +8,11 @@ import {NavLink} from "react-router-dom";
 export default function ToDoListe() {
     const [user, setUser] = useState(localStorage.getItem('username'))
     let [entrys, setEntrys] = useState([])
-    const [newEntry, setNewEntry] = useState({name: '', start: '', ende: ''})
+    const [newEntry, setNewEntry] = useState({name: '', start: '', stop: ''})
     const [message, setMessage] = useState('')
-    const [errorMessage, setErrorMessage] = useState('')
+    const [stopIndex, setStopIndex] = useState(0)
     const [showSpinner, setShowSpinner] = useState(false)
+
 
     useEffect(() => {
         loadContent()
@@ -25,13 +26,21 @@ export default function ToDoListe() {
     }
 
     function startTime(index) {
+        setStopIndex(index)
         entrys[index].start = getCurrentTime()
         storeEntry(user)
     }
 
+    function stopTime() {
+        entrys[stopIndex].stop = getCurrentTime()
+        storeEntry(user)
+    }
+
+
+
     function getCurrentTime() {
         let today = new Date()
-        return today.getMinutes < 10 ? today.getHours() + ':0' + today.getMinutes() : today.getHours() + ':' + today.getMinutes()
+        return today.getHours() + ':' + String(today.getMinutes()).padStart(2, "0")
     }
 
     function getWelcomeMessage() {
@@ -107,7 +116,7 @@ export default function ToDoListe() {
                 <h2>Settings</h2>
                 <br/>
                 <Button style={{background:"#526b4d", border:"#526b4d"}}>Pause</Button>
-                <Button style={{background:"#526b4d", border:"#526b4d"}}>Stop</Button>
+                <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={stopTime}>Stop</Button>
                 <Button style={{background:"#526b4d", border:"#526b4d"}}>Interrupt</Button>
                 <br/>
                 <br/>
@@ -132,7 +141,7 @@ export default function ToDoListe() {
                     <tr key={index}>
                         <td>{entry.name}</td>
                         <td>{entry.start}</td>
-                        <td>{entry.ende}</td>
+                        <td>{entry.stop}</td>
                         <td>
                             <Button onClick={() => startTime(index)}>Starten</Button>
                         </td>
