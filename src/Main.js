@@ -9,7 +9,7 @@ import {NavLink} from "react-router-dom";
 export default function ToDoListe() {
     const [user, setUser] = useState(localStorage.getItem('username'))
     let [entrys, setEntrys] = useState([])
-    const [newEntry, setNewEntry] = useState({name: '', start: '', stop: ''})
+    const [newEntry, setNewEntry] = useState({name: '', start: '', stop: '', hours: '', minutes: '', seconds: '', duration: '', interrupted: false, interruptedIndex: 0})
     const [message, setMessage] = useState('')
     const [stopIndex, setStopIndex] = useState(0)
     const [showSpinner, setShowSpinner] = useState(false)
@@ -35,18 +35,38 @@ export default function ToDoListe() {
     }
 
     function startTime(index) {
+        if(entrys[index].interrupted === true){
+           let interruptedIndex = parseInt(localStorage.getItem(user +": index -> "))
+            setMinutes(entrys[interruptedIndex].minutes)
+            setSeconds(entrys[interruptedIndex].seconds)
+            setHours(entrys[interruptedIndex].hours)
+        }else{
+
+            entrys[index].start = getCurrentTime()
+
+            setMinutes(0)
+            setSeconds(0)
+            setHours(0)
+            entrys[index].duration = String(hours).padStart(2, "0") + ':' + String(minutes).padStart(2, "0") +  ':' + String(seconds).padStart(2, "0")
+            storeEntry(user)
+
+        }
+        setStopIndex(index)
         setStopWatchValue(true)
         setStopButtonValue(false)
         setPauseButtonValue(false)
         setInterruptButtonValue(false)
-        setStopIndex(index)
-        entrys[index].start = getCurrentTime()
         storeEntry(user)
     }
 
     function stopTime() {
         resetValues()
         entrys[stopIndex].stop = getCurrentTime()
+        entrys[stopIndex].duration = String(hours).padStart(2, "0") + ':' + String(minutes).padStart(2, "0") +  ':' + String(seconds).padStart(2, "0")
+        entrys[stopIndex].hours = hours
+        entrys[stopIndex].minutes = minutes
+        entrys[stopIndex].seconds = seconds
+
         storeEntry(user)
     }
 
@@ -61,7 +81,10 @@ export default function ToDoListe() {
     }
 
     function interruptTime(){
+        entrys[stopIndex].interrupted = true
+        localStorage.setItem(user +": index -> ", String(stopIndex))
 
+        stopTime()
     }
 
     function pauseTime(){
@@ -77,7 +100,7 @@ export default function ToDoListe() {
 
     function getCurrentTime() {
         let today = new Date()
-        return today.getHours() + ':' + String(today.getMinutes()).padStart(2, "0")
+        return String(today.getHours()).padStart(2, "0") + ':' + String(today.getMinutes()).padStart(2, "0")
     }
 
     function getWelcomeMessage() {
@@ -183,7 +206,7 @@ export default function ToDoListe() {
                 <br/>
                 <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={pauseTime} disabled={pauseButtonValue}>Pause/Resume</Button>&emsp;
                 <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={stopTime} disabled={stopButtonValue}>Stop</Button>&emsp;
-                <Button style={{background:"#526b4d", border:"#526b4d"}} disabled={interruptButtonValue}>Interrupt</Button>
+                <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={interruptTime} disabled={interruptButtonValue}>Interrupt</Button>
                 <br/>
                 <br/>
             </div>
@@ -198,6 +221,7 @@ export default function ToDoListe() {
                     <th scope="col">Name</th>
                     <th scope="col">Start Time</th>
                     <th scope="col">End Time</th>
+                    <th scope="col">Duration</th>
                     <th scope="col">Start / Restart</th>
                     <th scope="col">Delete</th>
                 </tr>
@@ -208,6 +232,7 @@ export default function ToDoListe() {
                         <td>{entry.name}</td>
                         <td>{entry.start}</td>
                         <td>{entry.stop}</td>
+                        <td>{entry.duration}</td>
                         <td>
                             <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={() => startTime(index)}>Start</Button>
                         </td>
