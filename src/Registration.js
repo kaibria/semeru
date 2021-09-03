@@ -25,7 +25,7 @@ export default function Registration() {
     function isUserAlreadyUsed() {
         // on() method
         firebase.database().ref('usernames/' + username).on('value', (snap) => {
-            if (snap.val()) {
+            if (!snap.val().length > 0) {
                 console.log(snap.val())
                 setIsAlreadyUsed(true)
 
