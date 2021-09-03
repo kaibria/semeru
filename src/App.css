@@ -17,8 +17,38 @@ h1 {
 }
 
 
+.tableFixHead {
+    overflow: auto;
+    height: 220px;
+}
 
-.settingsComponent {
+.tableFixHead thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+/* Just common table stuff. Really. */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.tableBody{
+    border-bottom: 1px solid black;
+    border-top: 1px solid black;
+}
+
+th, td {
+    padding: 4px 0px;
+}
+
+th {
+    background: #D2E2CF;
+}
+
+
+.component {
     background-color: #D2E2CF;
 }
 

@@ -9,7 +9,17 @@ import {NavLink} from "react-router-dom";
 export default function ToDoListe() {
     const [user, setUser] = useState(localStorage.getItem('username'))
     let [entrys, setEntrys] = useState([])
-    const [newEntry, setNewEntry] = useState({name: '', start: '', stop: '', hours: '', minutes: '', seconds: '', duration: '', interrupted: false, interruptedIndex: 0})
+    const [newEntry, setNewEntry] = useState({
+        name: '',
+        start: '',
+        stop: '',
+        hours: '',
+        minutes: '',
+        seconds: '',
+        duration: '',
+        interrupted: false,
+        interruptedIndex: 0
+    })
     const [message, setMessage] = useState('')
     const [stopIndex, setStopIndex] = useState(0)
     const [showSpinner, setShowSpinner] = useState(false)
@@ -20,7 +30,6 @@ export default function ToDoListe() {
     const [seconds, setSeconds] = useState(0)
     const [minutes, setMinutes] = useState(0)
     const [hours, setHours] = useState(0)
-
 
 
     useEffect(() => {
@@ -35,19 +44,19 @@ export default function ToDoListe() {
     }
 
     function startTime(index) {
-        if(entrys[index].interrupted === true){
-           let interruptedIndex = parseInt(localStorage.getItem(user +": index -> "))
+        if (entrys[index].interrupted === true) {
+            let interruptedIndex = parseInt(localStorage.getItem(user + ": index -> "))
             setMinutes(entrys[interruptedIndex].minutes)
             setSeconds(entrys[interruptedIndex].seconds)
             setHours(entrys[interruptedIndex].hours)
-        }else{
+        } else {
 
             entrys[index].start = getCurrentTime()
 
             setMinutes(0)
             setSeconds(0)
             setHours(0)
-            entrys[index].duration = String(hours).padStart(2, "0") + ':' + String(minutes).padStart(2, "0") +  ':' + String(seconds).padStart(2, "0")
+            entrys[index].duration = String(hours).padStart(2, "0") + ':' + String(minutes).padStart(2, "0") + ':' + String(seconds).padStart(2, "0")
             storeEntry(user)
 
         }
@@ -62,7 +71,7 @@ export default function ToDoListe() {
     function stopTime() {
         resetValues()
         entrys[stopIndex].stop = getCurrentTime()
-        entrys[stopIndex].duration = String(hours).padStart(2, "0") + ':' + String(minutes).padStart(2, "0") +  ':' + String(seconds).padStart(2, "0")
+        entrys[stopIndex].duration = String(hours).padStart(2, "0") + ':' + String(minutes).padStart(2, "0") + ':' + String(seconds).padStart(2, "0")
         entrys[stopIndex].hours = hours
         entrys[stopIndex].minutes = minutes
         entrys[stopIndex].seconds = seconds
@@ -70,7 +79,7 @@ export default function ToDoListe() {
         storeEntry(user)
     }
 
-    function resetValues(){
+    function resetValues() {
         setSeconds(0)
         setMinutes(0)
         setHours(0)
@@ -80,22 +89,21 @@ export default function ToDoListe() {
         setInterruptButtonValue(true)
     }
 
-    function interruptTime(){
+    function interruptTime() {
         entrys[stopIndex].interrupted = true
-        localStorage.setItem(user +": index -> ", String(stopIndex))
+        localStorage.setItem(user + ": index -> ", String(stopIndex))
 
         stopTime()
     }
 
-    function pauseTime(){
-        if(stopWatchValue === false){
+    function pauseTime() {
+        if (stopWatchValue === false) {
             setStopWatchValue(true)
-        }else{
+        } else {
             setStopWatchValue(false)
         }
 
     }
-
 
 
     function getCurrentTime() {
@@ -164,18 +172,19 @@ export default function ToDoListe() {
         return (
             <div>
                 <h4 className="logout">S E M E R U<NavLink className={"logoutButton"}
-                    to="/login"><DoorClosedFill style={{color:"#526b4d", border:"#526b4d"}}></DoorClosedFill></NavLink></h4>
+                                                           to="/login"><DoorClosedFill
+                    style={{color: "#526b4d", border: "#526b4d"}}></DoorClosedFill></NavLink></h4>
             </div>
         )
     }
 
-    function Stopwatch(){
-        return(
+    function Stopwatch() {
+        return (
             <ReactStopwatch
                 seconds={seconds}
                 minutes={minutes}
                 hours={hours}
-                onChange={({hours, minutes, seconds}) =>{
+                onChange={({hours, minutes, seconds}) => {
                     setSeconds(seconds)
                     setMinutes(minutes)
                     setHours(hours)
@@ -183,11 +192,11 @@ export default function ToDoListe() {
                 }
                 onCallback={() => console.log('Finish')}
                 autoStart={stopWatchValue}
-                render={({ formatted}) => {
+                render={({formatted}) => {
                     return (
                         <div>
                             <p>
-                                { formatted }
+                                {formatted}
                             </p>
                         </div>
                     );
@@ -198,15 +207,38 @@ export default function ToDoListe() {
 
     function Settings() {
         return (
-            <div className="settingsComponent">
+            <div className="component">
                 <br/>
                 <h4 className={"setting"}>S E T T I N G S</h4>
                 <br/>
-                <h3  className={"stopwatch"}><Stopwatch></Stopwatch></h3>
+                <h3 className={"stopwatch"}><Stopwatch></Stopwatch></h3>
                 <br/>
-                <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={pauseTime} disabled={pauseButtonValue}>Pause/Resume</Button>&emsp;
-                <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={stopTime} disabled={stopButtonValue}>Stop</Button>&emsp;
-                <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={interruptTime} disabled={interruptButtonValue}>Interrupt</Button>
+                <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={pauseTime}
+                        disabled={pauseButtonValue}>Pause/Resume</Button>&emsp;
+                <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={stopTime}
+                        disabled={stopButtonValue}>Stop</Button>&emsp;
+                <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={interruptTime}
+                        disabled={interruptButtonValue}>Interrupt</Button>
+                <br/>
+                <br/>
+            </div>
+        )
+    }
+
+    function Statistics() {
+        return (
+            <div className="component">
+                <br/>
+                <h4 className={"setting"}>S T A T I S T I C S</h4>
+                <br/>
+                <h3 className={"stopwatch"}><Stopwatch></Stopwatch></h3>
+                <br/>
+                <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={pauseTime}
+                        disabled={pauseButtonValue}>Pause/Resume</Button>&emsp;
+                <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={stopTime}
+                        disabled={stopButtonValue}>Stop</Button>&emsp;
+                <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={interruptTime}
+                        disabled={interruptButtonValue}>Interrupt</Button>
                 <br/>
                 <br/>
             </div>
@@ -215,36 +247,39 @@ export default function ToDoListe() {
 
     function BetterTable() {
         return (
-            <table className="table">
-                <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Start Time</th>
-                    <th scope="col">End Time</th>
-                    <th scope="col">Duration</th>
-                    <th scope="col">Start / Restart</th>
-                    <th scope="col">Delete</th>
-                </tr>
-                </thead>
-                <tbody>
-                {entrys.length === 0 ? <div></div> : entrys.map((entry, index) =>
-                    <tr key={index}>
-                        <td>{entry.name}</td>
-                        <td>{entry.start}</td>
-                        <td>{entry.stop}</td>
-                        <td>{entry.duration}</td>
-                        <td>
-                            <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={() => startTime(index)}>Start</Button>
-                        </td>
-                        <td>
-                            <div onClick={() => deleteEntry(index)}>
-                                <Like/>
-                            </div>
-                        </td>
+            <div className="tableFixHead">
+                <table>
+                    <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Start Time</th>
+                        <th scope="col">End Time</th>
+                        <th scope="col">Duration</th>
+                        <th scope="col">Start / Restart</th>
+                        <th scope="col">Delete</th>
                     </tr>
-                )}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {entrys.length === 0 ? <div></div> : entrys.map((entry, index) =>
+                        <tr key={index} className={"tableBody"}>
+                            <td>{entry.name}</td>
+                            <td>{entry.start}</td>
+                            <td>{entry.stop}</td>
+                            <td>{entry.duration}</td>
+                            <td>
+                                <Button style={{background: "#526b4d", border: "#526b4d"}}
+                                        onClick={() => startTime(index)}>Start</Button>
+                            </td>
+                            <td>
+                                <div onClick={() => deleteEntry(index)}>
+                                    <Like/>
+                                </div>
+                            </td>
+                        </tr>
+                    )}
+                    </tbody>
+                </table>
+            </div>
         )
     }
 
@@ -253,7 +288,7 @@ export default function ToDoListe() {
         <div>
             <Logout/>
             <h1>{getWelcomeMessage()} {user}
-            <br/>
+                <br/>
             </h1>
             <br/>
             <br/>
@@ -272,18 +307,21 @@ export default function ToDoListe() {
                         onChange={e => setNewEntry(old => ({...old, name: e.target.value}))}
                     />
                 </InputGroup>
+                <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={saveEntry}>Add</Button>
             </div>
-            <br/>
-            <Button  style={{background:"#526b4d", border:"#526b4d"}} onClick={saveEntry}>Add</Button>
             <br/>
             <br/>
             <BetterTable/>
             <br/>
-            <Button  style={{background:"#526b4d", border:"#526b4d"}} onClick={deleteAll}>Delete All</Button>
+            <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={deleteAll}>Delete All</Button>
             <br/>
             <br/>
 
             <Settings></Settings>
+            <br/>
+            <br/>
+            <br/>
+            <Statistics></Statistics>
         </div>
     );
 }
