@@ -11,6 +11,7 @@ export default function Registration() {
     const [firstPw, setFirstPw] = useState('')
     const [errorMessage, setErrorMessage] = useState("")
     const [dropdownValue, setDropdownValue] = useState('')
+    const [isAlreadyUsed, setIsAlreadyUsed] = useState(false)
 
     let formOfAdress = [{value: "Mr. "}, {value: "Ms. "}, {value: "Mrs. "}]
 
@@ -21,19 +22,36 @@ export default function Registration() {
         firebase.database().ref('usernames/' + username + '/security/formOfAdress').set(dropdownValue)
     }
 
+    function isUserAlreadyUsed() {
+        // on() method
+        firebase.database().ref('usernames/' + username).on('value', (snap) => {
+            if (snap.val()) {
+                console.log(snap.val())
+                setIsAlreadyUsed(true)
+
+            }
+        });
+    }
+
     function validate() {
-        if (firstPw === password) {
-            if (username.length > 1) {
-                storeUser()
-                console.log(username)
-                history.push("/login")
+        isUserAlreadyUsed()
+        if (!isAlreadyUsed) {
+            if (firstPw === password) {
+                if (username.length > 1) {
+                    storeUser()
+                    console.log(username)
+                    history.push("/login")
+                } else {
+                    setErrorMessage("Username too short")
+                }
             } else {
-                setErrorMessage("Username too short")
+                setErrorMessage("Passwords do not match")
             }
         } else {
-            setErrorMessage("Passwords do not match")
+            setErrorMessage("User is already in use")
         }
     }
+
     return (
         <div>
             <h1>Semeru</h1><br/>
@@ -41,7 +59,8 @@ export default function Registration() {
             <br/>
 
             <Dropdown>
-                <Dropdown.Toggle variant="primary" id="dropdown-basic" style={{background: "#526b4d", border: "#526b4d"}}>
+                <Dropdown.Toggle variant="primary" id="dropdown-basic"
+                                 style={{background: "#526b4d", border: "#526b4d"}}>
                     Form of Adress
                 </Dropdown.Toggle>
                 <Dropdown.Menu>

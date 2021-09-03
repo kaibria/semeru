@@ -7,6 +7,9 @@ import Registration from './Registration.js'
 import firebase from 'firebase'
 
 
+// todo laufende task gelöscht
+// todo account security
+
 export default function App() {
 
 
