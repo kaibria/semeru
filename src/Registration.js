@@ -10,28 +10,30 @@ export default function Registration() {
     const [password, setPassword] = useState('')
     const [firstPw, setFirstPw] = useState('')
     const [errorMessage, setErrorMessage] = useState("")
+    const [dropdownValue, setDropdownValue] = useState('')
 
+    let formOfAdress = [{value: "Mr. "}, {value: "Ms. "}, {value: "Mrs. "}]
 
     const history = useHistory();
 
     function storeUser() {
         firebase.database().ref('usernames/' + username + '/security/password').set(password)
+        firebase.database().ref('usernames/' + username + '/security/formOfAdress').set(dropdownValue)
     }
 
     function validate() {
         if (firstPw === password) {
-            if(username.length > 1){
+            if (username.length > 1) {
                 storeUser()
                 console.log(username)
                 history.push("/login")
-            }else {
+            } else {
                 setErrorMessage("Username too short")
             }
         } else {
             setErrorMessage("Passwords do not match")
         }
     }
-
     return (
         <div>
             <h1>Semeru</h1><br/>
@@ -39,13 +41,12 @@ export default function Registration() {
             <br/>
 
             <Dropdown>
-                <Dropdown.Toggle variant="primary" id="dropdown-basic" style={{background:"#526b4d", border:"#526b4d"}}>
-                    Form of Address
+                <Dropdown.Toggle variant="primary" id="dropdown-basic" style={{background: "#526b4d", border: "#526b4d"}}>
+                    Form of Adress
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                    <Dropdown.Item >Mr.</Dropdown.Item>
-                    <Dropdown.Item >Ms.</Dropdown.Item>
-                    <Dropdown.Item >Mrs.</Dropdown.Item>
+                    {formOfAdress.map((adress, index) => <Dropdown.Item
+                        key={index} onClick={() => setDropdownValue(adress.value)}>{adress.value}</Dropdown.Item>)}
                 </Dropdown.Menu>
             </Dropdown>
 
@@ -91,8 +92,8 @@ export default function Registration() {
             </div>
             <h6 id={"errormessage"}>{errorMessage}</h6>
             <br/>
-            <Button style={{background:"#526b4d", border:"#526b4d"}} onClick={() => validate()}>Sign Up</Button>
-            <h6>Already have an account? <NavLink  className={"normalLink"} to="/login">Sign in</NavLink></h6>
+            <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={() => validate()}>Sign Up</Button>
+            <h6>Already have an account? <NavLink className={"normalLink"} to="/login">Sign in</NavLink></h6>
 
         </div>
     );

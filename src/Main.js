@@ -6,7 +6,7 @@ import {Button, FormControl, InputGroup, Spinner} from "react-bootstrap";
 import {DoorClosedFill, DoorOpen, DoorOpenFill, Square} from "react-bootstrap-icons";
 import {NavLink} from "react-router-dom";
 
-export default function ToDoListe() {
+export default function Main() {
     const [user, setUser] = useState(localStorage.getItem('username'))
     let [entrys, setEntrys] = useState([])
     const [newEntry, setNewEntry] = useState({
@@ -20,9 +20,7 @@ export default function ToDoListe() {
         interrupted: false,
         interruptedIndex: 0
     })
-    const [message, setMessage] = useState('')
     const [stopIndex, setStopIndex] = useState(0)
-    const [showSpinner, setShowSpinner] = useState(false)
     const [stopButtonValue, setStopButtonValue] = useState(true);
     const [pauseButtonValue, setPauseButtonValue] = useState(true);
     const [interruptButtonValue, setInterruptButtonValue] = useState(true);
@@ -30,15 +28,16 @@ export default function ToDoListe() {
     const [seconds, setSeconds] = useState(0)
     const [minutes, setMinutes] = useState(0)
     const [hours, setHours] = useState(0)
+    const [formOfAdress, setFormOfAdress] = useState('')
 
 
     useEffect(() => {
         loadContent()
+        findFormOfAdress()
     }, [])
 
     function saveEntry() {
 
-        // newEntry.start = getCurrentTime()
         entrys.push(newEntry)
         storeEntry(user)
     }
@@ -105,6 +104,17 @@ export default function ToDoListe() {
 
     }
 
+    function findFormOfAdress() {
+        // on() method
+        firebase.database().ref('usernames/' + user + '/security').on('value', (snap) => {
+            if (snap.val()) {
+                console.log("snap.val()", snap.val())
+                setFormOfAdress(snap.val().formOfAdress)
+
+            }
+        });
+    }
+
 
     function getCurrentTime() {
         let today = new Date()
@@ -133,7 +143,6 @@ export default function ToDoListe() {
         console.log("loading..")
         let newArray = []
         setEntrys(newArray)
-        setShowSpinner(true)
         readEntrys()
     }
 
@@ -144,7 +153,6 @@ export default function ToDoListe() {
                 console.log("snap.val()", snap.val())
                 setEntrys(snap.val())
             }
-            setShowSpinner(false)
         });
     }
 
@@ -173,7 +181,7 @@ export default function ToDoListe() {
             <div>
                 <h4 className="logout">S E M E R U<NavLink className={"logoutButton"}
                                                            to="/login"><DoorClosedFill
-                    style={{color: "#526b4d", border: "#526b4d"}}></DoorClosedFill></NavLink></h4>
+                    style={{color: "#526b4d", border: "#526b4d"}}/></NavLink></h4>
             </div>
         )
     }
@@ -211,7 +219,7 @@ export default function ToDoListe() {
                 <br/>
                 <h4 className={"setting"}>S E T T I N G S</h4>
                 <br/>
-                <h3 className={"stopwatch"}><Stopwatch></Stopwatch></h3>
+                <h3 className={"stopwatch"}><Stopwatch/></h3>
                 <br/>
                 <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={pauseTime}
                         disabled={pauseButtonValue}>Pause/Resume</Button>&emsp;
@@ -231,7 +239,7 @@ export default function ToDoListe() {
                 <br/>
                 <h4 className={"setting"}>S T A T I S T I C S</h4>
                 <br/>
-                <h3 className={"stopwatch"}><Stopwatch></Stopwatch></h3>
+                <h3 className={"stopwatch"}><Stopwatch/></h3>
                 <br/>
                 <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={pauseTime}
                         disabled={pauseButtonValue}>Pause/Resume</Button>&emsp;
@@ -260,7 +268,7 @@ export default function ToDoListe() {
                     </tr>
                     </thead>
                     <tbody>
-                    {entrys.length === 0 ? <div></div> : entrys.map((entry, index) =>
+                    {entrys.length === 0 ? <div/> : entrys.map((entry, index) =>
                         <tr key={index} className={"tableBody"}>
                             <td>{entry.name}</td>
                             <td>{entry.start}</td>
@@ -287,7 +295,7 @@ export default function ToDoListe() {
 
         <div>
             <Logout/>
-            <h1>{getWelcomeMessage()} {user}
+            <h1>{getWelcomeMessage()} {formOfAdress + user}
                 <br/>
             </h1>
             <br/>
@@ -317,11 +325,11 @@ export default function ToDoListe() {
             <br/>
             <br/>
 
-            <Settings></Settings>
+            <Settings/>
             <br/>
             <br/>
             <br/>
-            <Statistics></Statistics>
+            <Statistics/>
         </div>
     );
 }
