@@ -47,7 +47,7 @@ export default function Registration() {
             } else {
                 setErrorMessage("Passwords do not match")
             }
-        } //else {
+        //} //else {
             //setErrorMessage("User is already in use")
         //}
     }
