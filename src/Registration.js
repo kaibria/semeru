@@ -22,7 +22,7 @@ export default function Registration() {
         firebase.database().ref('usernames/' + username + '/security/formOfAdress').set(dropdownValue)
     }
 
-    function isUserAlreadyUsed() {
+    /*function isUserAlreadyUsed() {
         // on() method
         firebase.database().ref('usernames/' + username).on('value', (snap) => {
             if (!snap.val().length > 0) {
@@ -30,12 +30,12 @@ export default function Registration() {
                 setIsAlreadyUsed(true)
 
             }
-        });
-    }
+        });*/
+  //  }
 
     function validate() {
-        isUserAlreadyUsed()
-        if (!isAlreadyUsed) {
+        //isUserAlreadyUsed()
+        //if (!isAlreadyUsed) {
             if (firstPw === password) {
                 if (username.length > 1) {
                     storeUser()
@@ -47,9 +47,9 @@ export default function Registration() {
             } else {
                 setErrorMessage("Passwords do not match")
             }
-        } else {
-            setErrorMessage("User is already in use")
-        }
+        } //else {
+            //setErrorMessage("User is already in use")
+        //}
     }
 
     return (
