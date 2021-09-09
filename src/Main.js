@@ -2,8 +2,8 @@ import './App.css';
 import firebase from 'firebase';
 import React, {useEffect, useState} from "react";
 import ReactStopwatch from 'react-stopwatch';
-import {Button, FormControl, InputGroup, Spinner} from "react-bootstrap";
-import {DoorClosedFill, DoorOpen, DoorOpenFill, Square} from "react-bootstrap-icons";
+import {Button, FormControl, InputGroup} from "react-bootstrap";
+import {DoorClosedFill, Square} from "react-bootstrap-icons";
 import {NavLink} from "react-router-dom";
 
 export default function Main() {
@@ -20,7 +20,7 @@ export default function Main() {
         interrupted: false,
         interruptedIndex: 0
     })
-    const [stopIndex, setStopIndex] = useState(0)
+    const [entryIndex, setEntryIndex] = useState(0)
     const [stopButtonValue, setStopButtonValue] = useState(true);
     const [pauseButtonValue, setPauseButtonValue] = useState(true);
     const [interruptButtonValue, setInterruptButtonValue] = useState(true);
@@ -29,11 +29,16 @@ export default function Main() {
     const [minutes, setMinutes] = useState(0)
     const [hours, setHours] = useState(0)
     const [formOfAdress, setFormOfAdress] = useState('')
+    const [dates, setDates] = useState([])
+    const [dailyEntries, setDailyEntries] = useState([])
+    const [weeklyEntries, setWeeklyEntries] = useState([])
+    const [monthlyEntries, setMonthlyEntries] = useState([])
 
 
     useEffect(() => {
         loadContent()
         findFormOfAdress()
+        setStatistics()
     }, [])
 
     function saveEntry() {
@@ -42,7 +47,8 @@ export default function Main() {
         storeEntry(user)
     }
 
-    function startTime(index) {
+    async function startTime(index) {
+
         if (entrys[index].interrupted === true) {
             let interruptedIndex = parseInt(localStorage.getItem(user + ": index -> "))
             setMinutes(entrys[interruptedIndex].minutes)
@@ -51,6 +57,13 @@ export default function Main() {
         } else {
 
             entrys[index].start = getCurrentTime()
+            const newDates = await readDatesOfIndex(index)
+
+            if (newDates) {
+                setDates([...newDates, getCurrentDate()])
+            } else {
+                setDates([getCurrentDate()])
+            }
 
             setMinutes(0)
             setSeconds(0)
@@ -59,7 +72,7 @@ export default function Main() {
             storeEntry(user)
 
         }
-        setStopIndex(index)
+        setEntryIndex(index)
         setStopWatchValue(true)
         setStopButtonValue(false)
         setPauseButtonValue(false)
@@ -69,11 +82,11 @@ export default function Main() {
 
     function stopTime() {
         resetValues()
-        entrys[stopIndex].stop = getCurrentTime()
-        entrys[stopIndex].duration = String(hours).padStart(2, "0") + ':' + String(minutes).padStart(2, "0") + ':' + String(seconds).padStart(2, "0")
-        entrys[stopIndex].hours = hours
-        entrys[stopIndex].minutes = minutes
-        entrys[stopIndex].seconds = seconds
+        entrys[entryIndex].stop = getCurrentTime()
+        entrys[entryIndex].duration = String(hours).padStart(2, "0") + ':' + String(minutes).padStart(2, "0") + ':' + String(seconds).padStart(2, "0")
+        entrys[entryIndex].hours = hours
+        entrys[entryIndex].minutes = minutes
+        entrys[entryIndex].seconds = seconds
 
         storeEntry(user)
     }
@@ -89,8 +102,8 @@ export default function Main() {
     }
 
     function interruptTime() {
-        entrys[stopIndex].interrupted = true
-        localStorage.setItem(user + ": index -> ", String(stopIndex))
+        entrys[entryIndex].interrupted = true
+        localStorage.setItem(user + ": index -> ", String(entryIndex))
 
         stopTime()
     }
@@ -121,6 +134,10 @@ export default function Main() {
         return String(today.getHours()).padStart(2, "0") + ':' + String(today.getMinutes()).padStart(2, "0")
     }
 
+    function getCurrentDate() {
+        return new Date().toISOString().substring(0, 10)
+    }
+
     function getWelcomeMessage() {
         let hours = new Date().getHours()
 
@@ -136,6 +153,8 @@ export default function Main() {
     function storeEntry(user) {
         if (user != null) {
             firebase.database().ref('usernames/' + user + '/entries').set(entrys);
+            console.log(typeof dates)
+            firebase.database().ref('usernames/' + user + '/entries/' + entryIndex + "/dates").set(dates);
         }
     }
 
@@ -150,11 +169,48 @@ export default function Main() {
         // on() method
         firebase.database().ref('usernames/' + user + '/entries').on('value', (snap) => {
             if (snap.val()) {
-                console.log("snap.val()", snap.val())
+                console.log("Entries: ", snap.val())
                 setEntrys(snap.val())
             }
-        });
+        })
     }
+
+    async function readDatesOfIndex(index) {
+        // on() method
+        const snap = await firebase.database().ref('usernames/' + user + '/entries/' + index + '/dates').get()
+        console.log("index:" + index + " | dates:" + snap.val())
+
+        return snap.val();
+    }
+
+    async function readDates() {
+        // on() method
+        const snap = await firebase.database().ref('usernames/' + user + '/entries').get()
+
+        if (snap.val()) {
+            console.log("All Dates:" + snap.val())
+            return snap.val();
+        }
+    }
+
+    async function setStatistics() {
+        const allDates = await readDates()
+
+        if (allDates) {
+
+            for (let i = 0; i < allDates.length; i++) {
+                for (let date = 0; date < allDates[i].dates.length; date++) {
+                    if (allDates[i].dates[date] == getCurrentDate()) {
+                        setDailyEntries([...dailyEntries, allDates[i].name])
+                        console.log("Daily Entries: " + dailyEntries)
+                        console.log("Name: " + allDates[i].name)
+                    }
+                }
+            }
+        }
+
+    }
+
 
     function deleteEntry(index) {
         let newArray = entrys.filter((entry, idx) => idx !== index);
@@ -239,14 +295,11 @@ export default function Main() {
                 <br/>
                 <h4 className={"setting"}>S T A T I S T I C S</h4>
                 <br/>
-                <h3 className={"stopwatch"}><Stopwatch/></h3>
                 <br/>
-                <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={pauseTime}
-                        disabled={pauseButtonValue}>Pause/Resume</Button>&emsp;
-                <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={stopTime}
-                        disabled={stopButtonValue}>Stop</Button>&emsp;
-                <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={interruptTime}
-                        disabled={interruptButtonValue}>Interrupt</Button>
+                <h3>Daily</h3>
+                <h3>Weekly</h3>
+                <h3>Monthly</h3>
+
                 <br/>
                 <br/>
             </div>
@@ -307,7 +360,7 @@ export default function Main() {
             <br/>
             <h5>Task Name</h5>
             <div className={"d-flex"} id={"inputDiv"}>
-                <InputGroup className="form-group w-25">
+                <InputGroup className="form-group w-50">
                     <FormControl
                         aria-label="Default"
                         aria-describedby="inputGroup-sizing-default"

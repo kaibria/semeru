@@ -53,7 +53,7 @@ export default function Login() {
             <h1>Semeru</h1><br/>
             <h2>Login</h2>
             <div className={"d-flex"} id={"inputDiv"}>
-                <InputGroup className={"form-group w-25"}>
+                <InputGroup className={"form-group w-50"}>
                     <FormControl
                         aria-label="Default"
                         placeholder="Username"
@@ -64,7 +64,7 @@ export default function Login() {
             </div>
             <br/>
             <div className={"d-flex"} id={"inputDiv"}>
-                <InputGroup className={"form-group w-25"}>
+                <InputGroup className={"form-group w-50"}>
                     <FormControl
                         aria-label="Default"
                         type="password"

@@ -140,3 +140,12 @@ a.normalLink:link {
         transform: rotate(360deg);
     }
 }
+
+@media only screen and (max-width: 600px) {
+    .stopwatch {
+        font-size: 50px !important;
+    }
+    h1{
+        font-size: 30px !important;
+    }
+}
