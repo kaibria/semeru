@@ -2,10 +2,11 @@ import './App.css';
 import firebase from 'firebase';
 import React, {useEffect, useState} from "react";
 import ReactStopwatch from 'react-stopwatch';
-import {Button, FormControl, InputGroup} from "react-bootstrap";
+import {Button, FormControl, InputGroup, Container, Card, Accordion} from "react-bootstrap";
 import {DoorClosedFill, Square} from "react-bootstrap-icons";
 import {NavLink} from "react-router-dom";
 import * as moment from "moment";
+
 
 export default function Main() {
     const [user, setUser] = useState(localStorage.getItem('username'))
@@ -142,8 +143,8 @@ export default function Main() {
         return (now.isoWeek() == input.isoWeek())
     }
 
-    function isDateInThisMonth(date){
-        return date.substring(5,7) == getCurrentDate().substring(5,7)
+    function isDateInThisMonth(date) {
+        return date.substring(5, 7) == getCurrentDate().substring(5, 7)
 
     }
 
@@ -353,7 +354,10 @@ export default function Main() {
                 <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={setStatistics}>Load
                     Statistics</Button>
                 <br/>
+                <br/>
                 <StatisticsTable></StatisticsTable>
+                <br/>
+                <br/>
             </div>
         )
     }
@@ -361,69 +365,85 @@ export default function Main() {
     function StatisticsTable() {
         return (
             <div>
-
-                <h3>Daily</h3>
-                <br/>
-                <table>
-                    <thead>
-                    <tr>
-                        <th scope="col">Counter</th>
-                        <th scope="col">Name</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {dailyEntries.map((entry, index) =>
-                        <tr key={index} className={"tableBody"}>
-                            <td>{entry.count}</td>
-                            <td>{entry.name}</td>
-                        </tr>
-                    )}
-                    </tbody>
-                </table>
-                <br/>
-                <br/>
-
-                <h3>Weekly</h3>
-                <br/>
-                <table>
-                    <thead>
-                    <tr>
-                        <th scope="col">Counter</th>
-                        <th scope="col">Name</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {weeklyEntries.map((entry, index) =>
-                        <tr key={index} className={"tableBody"}>
-                            <td>{entry.count}</td>
-                            <td>{entry.name}</td>
-                        </tr>
-                    )}
-                    </tbody>
-                </table>
-                <br/>
-                <br/>
-
-                <h3>Monthly</h3>
-                <br/>
-                <table>
-                    <thead>
-                    <tr>
-                        <th scope="col">Counter</th>
-                        <th scope="col">Name</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {monthlyEntries.map((entry, index) =>
-                        <tr key={index} className={"tableBody"}>
-                            <td>{entry.count}</td>
-                            <td>{entry.name}</td>
-                        </tr>
-                    )}
-                    </tbody>
-                </table>
-
-
+                <Container>
+                    <Accordion>
+                        <Card>
+                            <Accordion.Toggle as={Card.Header} eventKey="0">
+                                Daily
+                            </Accordion.Toggle>
+                            <Accordion.Collapse eventKey="0">
+                                <Card.Body>
+                                    <table>
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">Amount</th>
+                                            <th scope="col">Name</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {dailyEntries.map((entry, index) =>
+                                            <tr key={index} className={"tableBody"}>
+                                                <td>{entry.count}</td>
+                                                <td>{entry.name}</td>
+                                            </tr>
+                                        )}
+                                        </tbody>
+                                    </table>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        <Card>
+                            <Accordion.Toggle as={Card.Header} eventKey="1">
+                                Weekly
+                            </Accordion.Toggle>
+                            <Accordion.Collapse eventKey="1">
+                                <Card.Body>
+                                    <table>
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">Amount</th>
+                                            <th scope="col">Name</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {weeklyEntries.map((entry, index) =>
+                                            <tr key={index} className={"tableBody"}>
+                                                <td>{entry.count}</td>
+                                                <td>{entry.name}</td>
+                                            </tr>
+                                        )}
+                                        </tbody>
+                                    </table>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        <Card>
+                            <Accordion.Toggle as={Card.Header} eventKey="2">
+                                Monthly
+                            </Accordion.Toggle>
+                            <Accordion.Collapse eventKey="2">
+                                <Card.Body>
+                                    <table>
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">Amount</th>
+                                            <th scope="col">Name</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {monthlyEntries.map((entry, index) =>
+                                            <tr key={index} className={"tableBody"}>
+                                                <td>{entry.count}</td>
+                                                <td>{entry.name}</td>
+                                            </tr>
+                                        )}
+                                        </tbody>
+                                    </table>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                    </Accordion>
+                </Container>
 
             </div>
 
