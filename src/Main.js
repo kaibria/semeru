@@ -142,6 +142,11 @@ export default function Main() {
         return (now.isoWeek() == input.isoWeek())
     }
 
+    function isDateInThisMonth(date){
+        return date.substring(5,7) == getCurrentDate().substring(5,7)
+
+    }
+
     function getWelcomeMessage() {
         let hours = new Date().getHours()
 
@@ -205,8 +210,10 @@ export default function Main() {
 
         const newDailyEntries = [{name: '', count: 0}];
         const newWeeklyEntries = [{name: '', count: 0}];
+        const newMonthlyEntries = [{name: '', count: 0}];
         let dailyCounter = 1
         let weeklyCounter = 1
+        let monthlyCounter = 1
 
         if (allDates) {
             for (let i = 0; i < allDates.length; i++) {
@@ -234,6 +241,17 @@ export default function Main() {
                                 newWeeklyEntries.push({name: allDates[i].name, count: weeklyCounter})
                             }
                         }
+                        //Statistiken für den Monat
+                        if (isDateInThisMonth(allDates[i].dates[date])) {
+                            const element = newMonthlyEntries.find(entry => entry.name === allDates[i].name);
+                            if (element) {
+                                monthlyCounter += 1
+                                element.count = monthlyCounter
+                            } else {
+                                monthlyCounter = 1
+                                newMonthlyEntries.push({name: allDates[i].name, count: monthlyCounter})
+                            }
+                        }
                     }
                 }
             }
@@ -243,6 +261,9 @@ export default function Main() {
 
         let newWeeklyArray = newWeeklyEntries.filter(entry => entry.name !== '');
         setWeeklyEntries([...newWeeklyArray]);
+
+        let newMonthlyArray = newMonthlyEntries.filter(entry => entry.name !== '');
+        setMonthlyEntries([...newMonthlyArray]);
 
     }
 
@@ -332,20 +353,81 @@ export default function Main() {
                 <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={setStatistics}>Load
                     Statistics</Button>
                 <br/>
-                <br/>
-                <h3>Daily</h3>
-                {dailyEntries.map((dailyEntry, idx) =>
-                    <ul key={idx}><h6>{dailyEntry.count + "x " + dailyEntry.name}</h6></ul>)}
-                <br/>
-                <h3>Weekly</h3>
-                {weeklyEntries.map((weeklyEntry, idx) =>
-                    <ul key={idx}><h6>{weeklyEntry.count + "x " + weeklyEntry.name}</h6></ul>)}
-                <br/>
-                <h3>Monthly</h3>
-
-                <br/>
-                <br/>
+                <StatisticsTable></StatisticsTable>
             </div>
+        )
+    }
+
+    function StatisticsTable() {
+        return (
+            <div>
+
+                <h3>Daily</h3>
+                <br/>
+                <table>
+                    <thead>
+                    <tr>
+                        <th scope="col">Counter</th>
+                        <th scope="col">Name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {dailyEntries.map((entry, index) =>
+                        <tr key={index} className={"tableBody"}>
+                            <td>{entry.count}</td>
+                            <td>{entry.name}</td>
+                        </tr>
+                    )}
+                    </tbody>
+                </table>
+                <br/>
+                <br/>
+
+                <h3>Weekly</h3>
+                <br/>
+                <table>
+                    <thead>
+                    <tr>
+                        <th scope="col">Counter</th>
+                        <th scope="col">Name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {weeklyEntries.map((entry, index) =>
+                        <tr key={index} className={"tableBody"}>
+                            <td>{entry.count}</td>
+                            <td>{entry.name}</td>
+                        </tr>
+                    )}
+                    </tbody>
+                </table>
+                <br/>
+                <br/>
+
+                <h3>Monthly</h3>
+                <br/>
+                <table>
+                    <thead>
+                    <tr>
+                        <th scope="col">Counter</th>
+                        <th scope="col">Name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {monthlyEntries.map((entry, index) =>
+                        <tr key={index} className={"tableBody"}>
+                            <td>{entry.count}</td>
+                            <td>{entry.name}</td>
+                        </tr>
+                    )}
+                    </tbody>
+                </table>
+
+
+
+            </div>
+
+
         )
     }
 
