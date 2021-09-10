@@ -5,6 +5,7 @@ import ReactStopwatch from 'react-stopwatch';
 import {Button, FormControl, InputGroup} from "react-bootstrap";
 import {DoorClosedFill, Square} from "react-bootstrap-icons";
 import {NavLink} from "react-router-dom";
+import * as moment from "moment";
 
 export default function Main() {
     const [user, setUser] = useState(localStorage.getItem('username'))
@@ -38,17 +39,14 @@ export default function Main() {
     useEffect(() => {
         loadContent()
         findFormOfAdress()
-        setStatistics()
     }, [])
 
     function saveEntry() {
-
         entrys.push(newEntry)
-        storeEntry(user)
+        storeEntry(user, entryIndex)
     }
 
     async function startTime(index) {
-
         if (entrys[index].interrupted === true) {
             let interruptedIndex = parseInt(localStorage.getItem(user + ": index -> "))
             setMinutes(entrys[interruptedIndex].minutes)
@@ -69,7 +67,7 @@ export default function Main() {
             setSeconds(0)
             setHours(0)
             entrys[index].duration = String(hours).padStart(2, "0") + ':' + String(minutes).padStart(2, "0") + ':' + String(seconds).padStart(2, "0")
-            storeEntry(user)
+            storeEntry(user, index)
 
         }
         setEntryIndex(index)
@@ -77,7 +75,7 @@ export default function Main() {
         setStopButtonValue(false)
         setPauseButtonValue(false)
         setInterruptButtonValue(false)
-        storeEntry(user)
+        storeEntry(user, index)
     }
 
     function stopTime() {
@@ -88,7 +86,7 @@ export default function Main() {
         entrys[entryIndex].minutes = minutes
         entrys[entryIndex].seconds = seconds
 
-        storeEntry(user)
+        storeEntry(user, entryIndex)
     }
 
     function resetValues() {
@@ -138,6 +136,12 @@ export default function Main() {
         return new Date().toISOString().substring(0, 10)
     }
 
+    function isDateInThisWeek(date) {
+        let now = moment();
+        let input = moment(date + "T11:45:00Z");
+        return (now.isoWeek() == input.isoWeek())
+    }
+
     function getWelcomeMessage() {
         let hours = new Date().getHours()
 
@@ -150,11 +154,11 @@ export default function Main() {
         }
     }
 
-    function storeEntry(user) {
+    function storeEntry(user, index) {
+        console.log("entry:" + entryIndex)
         if (user != null) {
             firebase.database().ref('usernames/' + user + '/entries').set(entrys);
-            console.log(typeof dates)
-            firebase.database().ref('usernames/' + user + '/entries/' + entryIndex + "/dates").set(dates);
+            firebase.database().ref('usernames/' + user + '/entries/' + index + "/dates").set(dates);
         }
     }
 
@@ -194,23 +198,53 @@ export default function Main() {
     }
 
     async function setStatistics() {
+        let emptyArray = []
+        setDailyEntries(emptyArray)
+
         const allDates = await readDates()
 
-        if (allDates) {
+        const newDailyEntries = [{name: '', count: 0}];
+        const newWeeklyEntries = [{name: '', count: 0}];
+        let dailyCounter = 1
+        let weeklyCounter = 1
 
+        if (allDates) {
             for (let i = 0; i < allDates.length; i++) {
-                for (let date = 0; date < allDates[i].dates.length; date++) {
-                    if (allDates[i].dates[date] == getCurrentDate()) {
-                        setDailyEntries([...dailyEntries, allDates[i].name])
-                        console.log("Daily Entries: " + dailyEntries)
-                        console.log("Name: " + allDates[i].name)
+                if (allDates[i].dates) {
+                    for (let date = 0; date < allDates[i].dates.length; date++) {
+                        //Statistiken für den Tag
+                        if (allDates[i].dates[date] == getCurrentDate()) {
+                            const element = newDailyEntries.find(entry => entry.name === allDates[i].name);
+                            if (element) {
+                                dailyCounter += 1
+                                element.count = dailyCounter
+                            } else {
+                                dailyCounter = 1
+                                newDailyEntries.push({name: allDates[i].name, count: dailyCounter})
+                            }
+                        }
+                        //Statistiken für die Woche
+                        if (isDateInThisWeek(allDates[i].dates[date])) {
+                            const element = newWeeklyEntries.find(entry => entry.name === allDates[i].name);
+                            if (element) {
+                                weeklyCounter += 1
+                                element.count = weeklyCounter
+                            } else {
+                                weeklyCounter = 1
+                                newWeeklyEntries.push({name: allDates[i].name, count: weeklyCounter})
+                            }
+                        }
                     }
                 }
             }
         }
+        let newDailyArray = newDailyEntries.filter(entry => entry.name !== '');
+        setDailyEntries([...newDailyArray]);
+
+        let newWeeklyArray = newWeeklyEntries.filter(entry => entry.name !== '');
+        setWeeklyEntries([...newWeeklyArray]);
 
     }
-
 
     function deleteEntry(index) {
         let newArray = entrys.filter((entry, idx) => idx !== index);
@@ -295,9 +329,18 @@ export default function Main() {
                 <br/>
                 <h4 className={"setting"}>S T A T I S T I C S</h4>
                 <br/>
+                <Button style={{background: "#526b4d", border: "#526b4d"}} onClick={setStatistics}>Load
+                    Statistics</Button>
+                <br/>
                 <br/>
                 <h3>Daily</h3>
+                {dailyEntries.map((dailyEntry, idx) =>
+                    <ul key={idx}><h6>{dailyEntry.count + "x " + dailyEntry.name}</h6></ul>)}
+                <br/>
                 <h3>Weekly</h3>
+                {weeklyEntries.map((weeklyEntry, idx) =>
+                    <ul key={idx}><h6>{weeklyEntry.count + "x " + weeklyEntry.name}</h6></ul>)}
+                <br/>
                 <h3>Monthly</h3>
 
                 <br/>
